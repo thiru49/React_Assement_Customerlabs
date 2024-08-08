@@ -15,6 +15,51 @@ const SaveSegment = () => {
   ]);
   const [show, setShow] = useState("");
 
+  const handleSegmentNameChange = (e) => {
+    setSegmentName(e.target.value);
+    setShow("");
+  };
+  const handleSchemaChange = (e) => {
+    setSchemas([
+      availableOptions.find((value) => value.value === e.target.value),
+    ]);
+  };
+
+  const addNewSchema = () => {
+    setSchemaData((pre) => [...pre, ...schemas]);
+    document.getElementById("select-schema").value = "";
+  };
+
+  const handleSaveSegment = () => {
+    if (segmentName === "") {
+      setShow("Please enter the segment name");
+      return;
+    }
+    let data = {
+      segment_name: segmentName,
+      schema: schemaData.map((schema) => ({
+        [schema.value]: schema.label,
+      })),
+    };
+    fetch("https://webhook.site/3dba54e4-2808-4996-8c7f-619fd665b2e3", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }).then((res) => {
+      console.log(res, "res");
+    });
+    alert(`Segment saved successfully ${segmentName}`);
+    alert(`Segment saved successfully ${segmentName}`);
+    alert(`Segment saved successfully ${segmentName}`);
+
+    setSegmentName("");
+    setSchemas([]);
+    setSchemaData([]);
+    console.log(data, "data");
+  };
+
   return (
     <div className="save-segment-container w-1/2 mx-auto bg-gray-50 p-4 rounded-md">
       <div className="flex flex-col gap-4">
@@ -28,10 +73,7 @@ const SaveSegment = () => {
             style={{ border: "2px solid black" }}
             className="p-2"
             value={segmentName}
-            onChange={(e) => {
-              setSegmentName(e.target.value);
-              setShow("");
-            }}
+            onChange={handleSegmentNameChange}
             placeholder="Name of the segment"
           />
           <p className="text-red-500">{show}</p>
@@ -107,13 +149,7 @@ const SaveSegment = () => {
               id="select-schema"
               style={{ border: "2px solid black", marginInline: "auto" }}
               className="p-2 bg-slate-100 mt-2 w-[80%]"
-              onChange={(e) => {
-                setSchemas([
-                  availableOptions.find(
-                    (value) => value.value === e.target.value
-                  ),
-                ]);
-              }}
+              onChange={handleSchemaChange}
             >
               <option value="">Add to Schema to Segment</option>
               {availableOptions
@@ -131,48 +167,14 @@ const SaveSegment = () => {
         </div>
         <div
           className="text-green-700 text-sm underline-offset-4 underline decoration-green-700 hover:cursor-pointer"
-          onClick={() => {
-            setSchemaData((pre) => [...pre, ...schemas]);
-            document.getElementById("select-schema").value = "";
-          }}
+          onClick={addNewSchema}
         >
           + Add new schema
         </div>
         <div>
           <button
             className="bg-green-600 text-white p-2 rounded-md"
-            onClick={() => {
-              if (segmentName === "") {
-                setShow("Please enter the segment name");
-                return;
-              }
-              let data = {
-                segment_name: segmentName,
-                schema: schemaData.map((schema) => ({
-                  [schema.value]: schema.label,
-                })),
-              };
-              fetch(
-                "https://webhook.site/3dba54e4-2808-4996-8c7f-619fd665b2e3",
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(data),
-                }
-              ).then((res) => {
-                console.log(res, "res");
-              });
-              alert(`Segment saved successfully ${segmentName}`);
-              alert(`Segment saved successfully ${segmentName}`);
-              alert(`Segment saved successfully ${segmentName}`);
-
-              setSegmentName("");
-              setSchemas([]);
-              setSchemaData([]);
-              console.log(data, "data");
-            }}
+            onClick={handleSaveSegment}
           >
             Save segment
           </button>
